@@ -23,6 +23,8 @@ void main() {
 	while (power < 2 || power > 5) {
 		scanf_s(" %d", &power);
 	}
+	printf("Delete all numb less than: ");
+	scanf_s(" %d", &temp);
 	for (int i = 0; i < n; i++) {
 		if (arr[i] % modnum == 0) {
 			arr[i] = pow(arr[i], power);
@@ -30,6 +32,15 @@ void main() {
 		printf("%d ", arr[i]);
 	}
 	printf("\n");
+
+	for (int i = 0; i < n; i++) {
+		if (arr[i] < temp) {
+			for (int k = 0; k < n; k++) {
+				arr[k + 1] = arr[k + 1];
+			}
+			n--;
+		}
+	}
 	for (int i = 0; i < n*0.5; i++) {
 		temp = arr[n-1 - i];
 		arr[n-1-i] = arr[i];
