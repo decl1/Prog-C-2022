@@ -11,7 +11,7 @@ void main() {
 
 	while (n > ARRLEN || n < 1) {
 		system("cls");
-		printf("Arr len (1-1000): ");
+		printf("Arr len (1-%d): ", ARRLEN);
 		scanf_s(" %d", &n);
 	}
 
