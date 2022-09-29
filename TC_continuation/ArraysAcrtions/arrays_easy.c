@@ -7,9 +7,9 @@
 void main() {
 	srand(time(0));
 	
-	int n = 0, modnum = 0, power = 0;
+	int n = 0, modnum = 0, power = 0,temp = 0;
 	printf("Arr len (1-1000): ");
-	while (n > 3000 || n < 1) {
+	while (n > 1000 || n < 1) {
 		scanf_s(" %d", &n);
 	}
 	int arr[ARRLEN];
@@ -23,10 +23,19 @@ void main() {
 	while (power < 2 || power > 5) {
 		scanf_s(" %d", &power);
 	}
-	for (int i = n-1; i > -1; i--) {
+	for (int i = 0; i < n; i++) {
 		if (arr[i] % modnum == 0) {
 			arr[i] = pow(arr[i], power);
 		}
+		printf("%d ", arr[i]);
+	}
+	printf("\n");
+	for (int i = 0; i < n*0.5; i++) {
+		temp = arr[n-1 - i];
+		arr[n-1-i] = arr[i];
+		arr[i] = temp;
+	}
+	for (int i = 0; i < n; i++) {
 		printf("%d ", arr[i]);
 	}
 
