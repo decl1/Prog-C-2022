@@ -50,13 +50,49 @@ void reversestr(char* str, int size) {
 void changetitle(char* str, int size) {
 	// ToApper
 	for (int i = 0; i < size; i++) {
-		if ((int)str[i] > 0) {
-			(int)str[i] > (int)'A' ? printf("%c", (char)((int)str[i] - abs((int)'A' - (int)'a'))) : printf("%c", str[i]);
+		if (str[i] >= 'a' && str[i] <= 'z') {
+			printf("%c", str[i] - 32);
 		}
-		else if ((int)str[i < 0]) {
-			(int)str[i] < (int)'À' ? printf("%c", (char)((int)str[i] + abs((int)'À' - (int)'à'))) : printf("%c", str[i]);;
+		else if (str[i] >= 'à' && str[i] <= 'ÿ') {
+			printf("%c", str[i] - 32);
+		}
+		else {
+			printf("%c", str[i]);
 		}
 	}
+	printf("\n");
+	//ToDown
+	for (int i = 0; i < size; i++) {
+		if (str[i] >= 'A' && str[i] <= 'Z') {
+			printf("%c", str[i] + 32);
+		}
+		else if (str[i] >= 'À' && str[i] <= 'ß') {
+			printf("%c", str[i] + 32);
+		}
+		else {
+			printf("%c", str[i]);
+		}
+	}
+	printf("\n");
+	//ToReverse
+	for (int i = 0; i < size; i++) {
+		if (str[i] >= 'A' && str[i] <= 'Z') {
+			printf("%c", str[i] + 32);
+		}
+		else if (str[i] >= 'a' && str[i] <= 'z') {
+			printf("%c", str[i] - 32);
+		}
+		else if (str[i] >= 'À' && str[i] <= 'ß') {
+			printf("%c", str[i] + 32);
+		}
+		else if (str[i] >= 'à' && str[i] <= 'ÿ') {
+			printf("%c", str[i] - 32);
+		}
+		else {
+			printf("%c", str[i]);
+		}
+	}
+	printf("\n");
 }
 
 void getresult(char* str, int size) {
@@ -75,6 +111,12 @@ int gotoquastion() {
 	}
 	return flag;
 }
+
+//void main() {
+//	setlocale(LC_ALL, "rus");
+//	char str[] = "àÁâÃä aBcDeF";
+//	changetitle(str, 12);
+//}
 
 int main() {
 	setlocale(LC_ALL, "rus");
@@ -114,8 +156,14 @@ start:
 			break;
 		}
 	case 4:
-		changetitle(str,size);
-		break;
+		changetitle(str, size);
+		if (gotoquastion() == 1) {
+			system("cls");
+			goto start;
+		}
+		else {
+			break;
+		}
 	case 0:
 		printf("Äî ñâèäàíèÿ!");
 		return 0;
