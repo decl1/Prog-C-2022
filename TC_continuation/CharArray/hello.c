@@ -119,11 +119,13 @@ int gotoquastion() {
 //}
 
 int main() {
-	setlocale(LC_ALL, "rus");
+	SetConsoleOutputCP(1251);
+	SetConsoleCP(1251);
 	char* str = (char*)malloc(sizeof(char) * 100);
 	int* size;
 	int menu = -1;
 	getstr(str, &size);
+	getresult(str,size);
 start:
 	printMenu();
 	scanf_s(" %d", &menu);
@@ -165,11 +167,11 @@ start:
 			break;
 		}
 	case 0:
-		printf("До свидания!");
-		return 0;
 		break;
 	default:
 		system("cls");
 		goto start;
 	}
+	printf("До свидания!");
+	return 0;
 }
