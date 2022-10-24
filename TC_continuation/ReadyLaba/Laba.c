@@ -24,7 +24,7 @@
 
 void choosepos(int* choose_pos, char** menu, COORD* cursorPos, HANDLE hStdOut, int menu_size, char* text) {
     int iKey = 67;
-    int line = (text == "") ? 0 : 1;
+    int line = (text == NONE_TITLE) ? 0 : 1;
     *cursorPos = (COORD){ 0, line };
     *choose_pos = 0;
     SetConsoleCursorPosition(hStdOut, *cursorPos);
@@ -131,25 +131,30 @@ int ifsorted(int* array, int size) {
     return ctrl;
 }
 void binsearch(int* array, int size) {
-    int x;
-    printf("¬ведите искомое число X: ");
-    scanf_s(" %d", &x);
-    system("cls");
-    int l = 0, r = size - 1;
-    int flag = 0;
-    while (l <= r) {
-        int c = (l + r) / 2;
-        if (array[c] == x) {
-            printf("Ёлемент X = %d найден с индексом %d\n",x,c);
-            flag = 1;
-            break;
+    if (size != -1) {
+        int x;
+        printf("¬ведите искомое число X: ");
+        scanf_s(" %d", &x);
+        system("cls");
+        int l = 0, r = size - 1;
+        int flag = 0;
+        while (l <= r) {
+            int c = (l + r) / 2;
+            if (array[c] == x) {
+                printf("Ёлемент X = %d найден с индексом %d\n",x,c);
+                flag = 1;
+                break;
+            }
+            if (array[c] > x)
+                r = c - 1;
+            else
+                l = c + 1;
         }
-        if (array[c] > x)
-            r = c - 1;
-        else
-            l = c + 1;
+        printf("%s", (flag == 1 ? "" : "Ёлемент не найден\n"));
     }
-    printf("%s", (flag == 1 ? "" : "Ёлемент не найден\n"));
+    else {
+        printf("ћассив не определен\n");
+    }
 }
 
 
