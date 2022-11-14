@@ -214,23 +214,29 @@ int main() {
                             break;
                         case 1: // Bin search
                             system("cls");
-                            char* yesno[2] = {"Yes", "No"};
-                            if (ifsorted(array, arrsize) == 1) { 
-                                binsearch(array, arrsize);
-                                system("pause");
-                            } else {
-                                choosepos(&choose_pos, yesno, &cursorPos, hStdOut, 2, "Массив не отсортирован. Отсортировать?");
-                                switch (choose_pos) {
-                                case 0:
-                                    system("cls");
-                                    bubble_sort(array, arrsize);
-                                    printarray(array, arrsize);
+                            if (arrsize != -1) {
+                                char* yesno[2] = {"Yes", "No"};
+                                if (ifsorted(array, arrsize) == 1) { 
+                                    binsearch(array, arrsize);
                                     system("pause");
-                                    break;
-                                case 1:
-                                    system("cls");
-                                    break;
+                                } else {
+                                    choosepos(&choose_pos, yesno, &cursorPos, hStdOut, 2, "Массив не отсортирован. Отсортировать?");
+                                    switch (choose_pos) {
+                                    case 0:
+                                        system("cls");
+                                        bubble_sort(array, arrsize);
+                                        printarray(array, arrsize);
+                                        system("pause");
+                                        break;
+                                    case 1:
+                                        system("cls");
+                                        break;
+                                    }
                                 }
+                            }
+                            else {
+                                printf("Массив не определен\n");
+                                system("pause");
                             }
                             break;
                         case 2: //Back
