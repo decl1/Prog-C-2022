@@ -21,9 +21,12 @@
 #define ALGMENU_SIZE 3
 #define SEARCHMENU_SIZE 3
 #define SORTMENU_SIZE 2
-#define SETSMENU_SIZE 3
+#define SETSMENU_SIZE 4
 #define NONE_TITLE ""
 
+#define LANG_CNT 2
+#define RUS 0
+#define ENG 1
 
 void choosepos(int* choose_pos, char** menu, COORD* cursorPos, HANDLE hStdOut, int menu_size, char* text) {
     int iKey = 67;
@@ -63,25 +66,25 @@ void choosepos(int* choose_pos, char** menu, COORD* cursorPos, HANDLE hStdOut, i
         iKey = _getch();
     }
 }
-void initarray(int** array, int* size) {
+void initarray(int** array, int* size, int lang) {
     system("cls");
-    printf("Введите кол-во элементов: ");
+    printf( lang  == 0 ? "Введите кол-во элементов: ": "Enter number of elements: ");
     scanf_s(" %d", size);
     *array = (int*)malloc(sizeof(int) * (*size));
 }
-void fillmass(int* array, int size) {
-    printf("Введите элементы массива: ");
+void fillmass(int* array, int size, int lang) {
+    printf(lang == 0 ? "Введите элементы массива: ": "Enter elements of array: ");
     for (int i = 0; i < size; i++) {
         scanf_s(" %d", &array[i]);
     }
 }
-void printarray(int* array, int size) {
+void printarray(int* array, int size, int lang) {
     system("cls");
     if (size == -1) {
-        printf("Массив не определен");
+        printf(lang == 0?"Массив не определен":"Array not defined");
     }
     else {
-        printf("Ваш массив: ");
+        printf(lang == 0?"Ваш массив: ":"Your array: ");
         for (int i = 0; i < size; i++) {
             printf("%d ", array[i]);
         }
@@ -102,13 +105,13 @@ void bubble_sort(int* array, int size) {
         }
     }
 }
-void stupidsearch(int* array, int size) {
+void stupidsearch(int* array, int size, int lang) {
     system("cls");
     if (size != -1) {
         int number, cnt = 0;
-        printf("Введите искомое число: ");
+        printf(lang == 0 ? "Введите искомое число: ": "Enter desired number: ");
         scanf_s(" %d", &number);
-        printf("Индексы найденных элементов: ");
+        printf(lang == 0? "Индексы найденных элементов: ": "Indexes of found elements: ");
         for (int i = 0; i < size; i++) {
             if (array[i] == number) {
                 printf("%d ", i);
@@ -116,11 +119,11 @@ void stupidsearch(int* array, int size) {
             }
         }
         if (cnt == 0) {
-            printf("элементы не найдены");
+            printf(lang == 0?"элементы не найдены":"elements not found");
         }
     }
     else {
-        printf("Массив не определен");
+        printf(lang == 0 ? "Массив не определен": "Array not defined");
     }
     printf("\n");
 }
@@ -134,10 +137,10 @@ int ifsorted(int* array, int size) {
     }
     return ctrl;
 }
-void binsearch(int* array, int size) {
+void binsearch(int* array, int size, int lang) {
     if (size != -1) {
         int x;
-        printf("Введите искомое число X: ");
+        printf(lang == 0 ? "Введите искомое число X: ": "Enter desired number X: ");
         scanf_s(" %d", &x);
         system("cls");
         int l = 0, r = size - 1;
@@ -145,7 +148,7 @@ void binsearch(int* array, int size) {
         while (l <= r) {
             int c = (l + r) / 2;
             if (array[c] == x) {
-                printf("Элемент X = %d найден с индексом %d\n", x, c);
+                printf(lang == 0? "Элемент X = %d найден с индексом %d\n": "Element X = %d found with index %d\n", x, c);
                 flag = 1;
                 break;
             }
@@ -154,10 +157,10 @@ void binsearch(int* array, int size) {
             else
                 l = c + 1;
         }
-        printf("%s", (flag == 1 ? "" : "Элемент не найден\n"));
+        printf("%s", (flag == 1 ? "" : lang == 0 ? "Элемент не найден\n": "Element not found\n"));
     }
     else {
-        printf("Массив не определен\n");
+        printf(lang == 0 ? "Массив не определен" : "Array not defined");
     }
 }
 
@@ -184,22 +187,25 @@ int main() {
     int incase_flag;
     COORD cursorPos;
 
-    char* menu[MENU_SIZE] = { "Режим эксперимента","Алгоритмы", "Settings/Настройки", "Выход"};
-    char* algorithms[ALGMENU_SIZE] = { "Поиск", "Сортировки", "Назад" };
-    char* search[SEARCHMENU_SIZE] = { "Наивный поиск","Бинарный поиск", "Назад" };
-    char* sorts[SORTMENU_SIZE] = { "Пузырьковая сортировка", "Назад" };
-    char* settings[SETSMENU_SIZE] = { "Задать массив", "Посмотреть текущий массив", "Назад" };
+    char* menu[LANG_CNT][MENU_SIZE] = { { "Режим эксперимента","Алгоритмы", "Settings/Настройки", "Выход"},{"Exp mode","Algs","Settings/Настройки","Exit"}};
+    char* algorithms[LANG_CNT][ALGMENU_SIZE] = { { "Поиск", "Сортировки", "Назад" }, { "Search","Sorts","Back" } };
+    char* search[LANG_CNT][SEARCHMENU_SIZE] = { { "Наивный поиск","Бинарный поиск", "Назад" }, { "Stupid search","Bin search","Back" } };
+    char* sorts[LANG_CNT][SORTMENU_SIZE] = { { "Пузырьковая сортировка", "Назад" }, { "Bubble sort","Back"} };
+    char* settings[LANG_CNT][SETSMENU_SIZE] = { {"Language/Язык", "Задать массив", "Посмотреть текущий массив", "Назад"}, {"Language/Язык","Set array","Check our array","Back"}};
+
+    char* lngs[LANG_CNT] = { "Русский","English" };
 
     int* array = NULL;
     int arrsize = -1;
 
+    int language = RUS;
 
     exit_flag = 0;
     incase_flag = 1;
 
     while (!exit_flag) {
         system("cls");
-        choosepos(&choose_pos, menu, &cursorPos, hStdOut, MENU_SIZE, NONE_TITLE);
+        choosepos(&choose_pos, menu[language], &cursorPos, hStdOut, MENU_SIZE, NONE_TITLE);
         switch (choose_pos) {
         case 0: // Exp
             system("cls");
@@ -209,32 +215,32 @@ int main() {
             incase_flag = 1;
             while (incase_flag >= 1) {
                 system("cls");
-                choosepos(&choose_pos, algorithms, &cursorPos, hStdOut, ALGMENU_SIZE, NONE_TITLE);
+                choosepos(&choose_pos, algorithms[language], &cursorPos, hStdOut, ALGMENU_SIZE, NONE_TITLE);
                 switch (choose_pos) {
                 case 0: // Search
                     incase_flag = 2;
                     while (incase_flag >= 2) {
-                        choosepos(&choose_pos, search, &cursorPos, hStdOut, SEARCHMENU_SIZE, NONE_TITLE);
+                        choosepos(&choose_pos, search[language], &cursorPos, hStdOut, SEARCHMENU_SIZE, NONE_TITLE);
                         switch (choose_pos) {
                         case 0: // Simple search
-                            stupidsearch(array, arrsize);
+                            stupidsearch(array, arrsize, language);
                             system("pause");
                             break;
                         case 1: // Bin search
                             system("cls");
                             if (arrsize != -1) {
-                                char* yesno[2] = { "Yes", "No" };
+                                char* yesno[LANG_CNT][2] = { {"Да","Нет"}, { "Yes", "No" } };
                                 if (ifsorted(array, arrsize) == 1) {
-                                    binsearch(array, arrsize);
+                                    binsearch(array, arrsize, language);
                                     system("pause");
                                 }
                                 else {
-                                    choosepos(&choose_pos, yesno, &cursorPos, hStdOut, 2, "Массив не отсортирован. Отсортировать?");
+                                    choosepos(&choose_pos, yesno[language], &cursorPos, hStdOut, 2, language == 0 ? "Массив не отсортирован. Отсортировать?" : "Array not sorted. Sort it?");
                                     switch (choose_pos) {
                                     case 0:
                                         system("cls");
                                         bubble_sort(array, arrsize);
-                                        printarray(array, arrsize);
+                                        printarray(array, arrsize, language);
                                         system("pause");
                                         break;
                                     case 1:
@@ -244,7 +250,7 @@ int main() {
                                 }
                             }
                             else {
-                                printf("Массив не определен\n");
+                                printf(language == 0 ? "Массив не определен\n" : "Array not defined\n");
                                 system("pause");
                             }
                             break;
@@ -257,11 +263,11 @@ int main() {
                 case 1: // Sort
                     incase_flag = 2;
                     while (incase_flag >= 2) {
-                        choosepos(&choose_pos, sorts, &cursorPos, hStdOut, SORTMENU_SIZE, NONE_TITLE);
+                        choosepos(&choose_pos, sorts[language], &cursorPos, hStdOut, SORTMENU_SIZE, NONE_TITLE);
                         switch (choose_pos) {
                         case 0: // Bubble sort
                             bubble_sort(array, arrsize);
-                            printarray(array, arrsize);
+                            printarray(array, arrsize, language);
                             system("pause");
                             break;
                         case 1: //Back
@@ -281,19 +287,24 @@ int main() {
             incase_flag = 1;
             while (incase_flag == 1) {
                 system("cls");
-                choosepos(&choose_pos, settings, &cursorPos, hStdOut, SETSMENU_SIZE, NONE_TITLE);
+                choosepos(&choose_pos, settings[language], &cursorPos, hStdOut, SETSMENU_SIZE, NONE_TITLE);
                 switch (choose_pos) {
                 case 0:
-                    initarray(&array, &arrsize);
-                    fillmass(array, arrsize);
-                    printarray(array, arrsize);
-                    system("pause");
+                    system("cls");
+                    choosepos(&choose_pos, lngs, &cursorPos, hStdOut, 2, "Выберете язык / Select a language");
+                    language = choose_pos;
                     break;
                 case 1:
-                    printarray(array, arrsize);
+                    initarray(&array, &arrsize, language);
+                    fillmass(array, arrsize, language);
+                    printarray(array, arrsize, language);
                     system("pause");
                     break;
                 case 2:
+                    printarray(array, arrsize, language);
+                    system("pause");
+                    break;
+                case 3:
                     system("cls");
                     incase_flag = 0;
                     break;
@@ -307,7 +318,7 @@ int main() {
     }
 
     system("cls");
-    printf("Goodbay!\n");
+    printf(language == 0? "Досвидания!\n" : "Goodbay!\n");
     free(array);
     system("pause");
     return 0;
