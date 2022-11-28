@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <windows.h>
 #include <conio.h>
+#include <time.h>
 
 #define KEY_EXIT 27
 #define KEY_ENTER 13
@@ -22,6 +23,8 @@
 #define SEARCHMENU_SIZE 3
 #define SORTMENU_SIZE 2
 #define SETSMENU_SIZE 4
+#define SETARR_SIZE 4
+
 #define NONE_TITLE ""
 
 #define LANG_CNT 2
@@ -34,8 +37,12 @@ void choosepos(int* choose_pos, char** menu, COORD* cursorPos, HANDLE hStdOut, i
     *cursorPos = (COORD){ 0, line };
     *choose_pos = 0;
     SetConsoleCursorPosition(hStdOut, *cursorPos);
-    while (iKey != KEY_EXIT && iKey != KEY_ENTER) {
+    while (iKey != KEY_ENTER) {
         switch (iKey) {
+        case KEY_EXIT:
+            (*choose_pos) = menu_size - 1;
+            return 0;
+            break;
         case KEY_ARROW_UP:
             (*choose_pos)--;
             break;
@@ -163,16 +170,23 @@ void binsearch(int* array, int size, int lang) {
         printf(lang == 0 ? "Массив не определен" : "Array not defined");
     }
 }
-
+void randarray(int* array, int size, int lang) {
+    printf(lang == 0 ? "Введите минимальный и максимальный элемент (a b): " : "Enter min and max element (a b): ");
+    int min, max;
+    scanf_s("%d %d", &min, &max); 
+    for (int i = 0; i < size; i++) {
+        array[i] = min + rand() % (abs(min-max)+1);
+    }
+}
 
 int main() {
     system("title Application");
 
+    srand(time(0));
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
 
     HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-
 
     CONSOLE_CURSOR_INFO structCursorInfo;
     GetConsoleCursorInfo(hStdOut, &structCursorInfo);
@@ -192,6 +206,7 @@ int main() {
     char* search[LANG_CNT][SEARCHMENU_SIZE] = { { "Наивный поиск","Бинарный поиск", "Назад" }, { "Stupid search","Bin search","Back" } };
     char* sorts[LANG_CNT][SORTMENU_SIZE] = { { "Пузырьковая сортировка", "Назад" }, { "Bubble sort","Back"} };
     char* settings[LANG_CNT][SETSMENU_SIZE] = { {"Language/Язык", "Задать массив", "Посмотреть текущий массив", "Назад"}, {"Language/Язык","Set array","Check our array","Back"}};
+    char* setarrayact[LANG_CNT][SETARR_SIZE] = { {"Ручной ввод","Рандомный ввод","Прочитать из файла", "Назад"}, {"Manual enter","Random array","Read from file", "Back"}};
 
     char* lngs[LANG_CNT] = { "Русский","English" };
 
@@ -285,26 +300,57 @@ int main() {
             break;
         case 2: // Settings
             incase_flag = 1;
-            while (incase_flag == 1) {
+            while (incase_flag >= 1) {
                 system("cls");
                 choosepos(&choose_pos, settings[language], &cursorPos, hStdOut, SETSMENU_SIZE, NONE_TITLE);
                 switch (choose_pos) {
-                case 0:
+                case 0: // lang
                     system("cls");
                     choosepos(&choose_pos, lngs, &cursorPos, hStdOut, 2, "Выберете язык / Select a language");
                     language = choose_pos;
                     break;
-                case 1:
-                    initarray(&array, &arrsize, language);
-                    fillmass(array, arrsize, language);
+                case 1: // set array
+                    incase_flag = 2;
+                    while (incase_flag >= 2) {
+
+                        system("cls");
+                        choosepos(&choose_pos, setarrayact[language], &cursorPos, hStdOut, SETARR_SIZE, language == 0 ? "Как вы собираетесь задать массив?" : "How you want enter the array?");   
+
+                        switch (choose_pos) {
+                        case 0: // manual enter
+                            system("cls");
+                            free(array);
+                            initarray(&array, &arrsize, language);
+                            fillmass(array, arrsize, language);
+                            printarray(array, arrsize, language);
+                            incase_flag = 1;
+                            system("pause");
+                            break;
+                        case 1: // rand enter
+                            system("cls");
+                            free(array);
+                            initarray(&array, &arrsize, language);
+                            randarray(array, arrsize, language);
+                            printarray(array, arrsize, language);
+                            incase_flag = 1;
+                            system("pause");
+                            break;
+                        case 2: // read from file
+                            system("cls");
+                            incase_flag = 1;
+                            break;
+                        case 3: // back
+                            system("cls");
+                            incase_flag = 1;
+                            break;
+                        }
+                    }
+                    break;
+                case 2: // check array
                     printarray(array, arrsize, language);
                     system("pause");
                     break;
-                case 2:
-                    printarray(array, arrsize, language);
-                    system("pause");
-                    break;
-                case 3:
+                case 3: // back
                     system("cls");
                     incase_flag = 0;
                     break;
