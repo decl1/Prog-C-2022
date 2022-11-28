@@ -199,7 +199,7 @@ int main() {
     int choose_pos;
     int exit_flag;
     int incase_flag;
-    COORD cursorPos;
+    COORD cursorPos;     
 
     char* menu[LANG_CNT][MENU_SIZE] = { { "Режим эксперимента","Алгоритмы", "Settings/Настройки", "Выход"},{"Exp mode","Algs","Settings/Настройки","Exit"}};
     char* algorithms[LANG_CNT][ALGMENU_SIZE] = { { "Поиск", "Сортировки", "Назад" }, { "Search","Sorts","Back" } };
@@ -337,6 +337,14 @@ int main() {
                             break;
                         case 2: // read from file
                             system("cls");
+                            char filepath[300];
+                            printf(language == 0 ? "Введите расположение файла: " : "Input filepath: ");
+                            gets(filepath);
+                            system("cls");
+                            printf("%s", filepath);
+                            FILE* file = fopen(filepath, "r");
+
+                            system("pause");
                             incase_flag = 1;
                             break;
                         case 3: // back
