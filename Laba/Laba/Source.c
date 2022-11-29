@@ -6,6 +6,7 @@
 #include <windows.h>
 #include <conio.h>
 #include <time.h>
+#include "sys/stat.h"
 
 #define KEY_EXIT 27
 #define KEY_ENTER 13
@@ -178,6 +179,34 @@ void randarray(int* array, int size, int lang) {
         array[i] = min + rand() % (abs(min-max)+1);
     }
 }
+void initfromfile(FILE* file, int *arrsize,int** array, char* filepath) {
+    errno_t error;
+
+    error = fopen_s(&file, filepath, "r+");
+
+    if (file == NULL) {
+        printf("Error in input file. Error %d\n", error);
+    }
+    else {
+        if (fscanf_s(file, "%d", arrsize) != 1) {
+            printf("Error\n");
+            return 0;
+        }
+    }
+    *array = (int*)malloc(sizeof(int) * (*arrsize));
+    printf("%d\n", *arrsize);
+     
+}
+void fillfromfile(FILE* file, int arrsize, int* array, int language) {
+    for (int i = 0; i < arrsize; i++) {
+        if (fscanf_s(file, "%d", &array[i]) != 1) {
+            printf("Error\n");
+            return 0;
+        }
+    }
+    printf(language == 0 ? "Массив получен\n" : "Data was read\n");
+}
+
 
 int main() {
     system("title Application");
@@ -214,6 +243,9 @@ int main() {
     int arrsize = -1;
 
     int language = RUS;
+
+    FILE* file = NULL;
+    errno_t error;
 
     exit_flag = 0;
     incase_flag = 1;
@@ -338,12 +370,45 @@ int main() {
                         case 2: // read from file
                             system("cls");
                             char filepath[300];
+
+                            GetConsoleCursorInfo(hStdOut, &structCursorInfo);
+                            structCursorInfo.bVisible = TRUE;
+                            SetConsoleCursorInfo(hStdOut, &structCursorInfo);
+                            //char debutsymbol;
                             printf(language == 0 ? "Введите расположение файла: " : "Input filepath: ");
+                            scanf_s(" ");
                             gets(filepath);
                             system("cls");
-                            printf("%s", filepath);
-                            FILE* file = fopen(filepath, "r");
 
+                            GetConsoleCursorInfo(hStdOut, &structCursorInfo);
+                            structCursorInfo.bVisible = FALSE;
+                            SetConsoleCursorInfo(hStdOut, &structCursorInfo);
+
+                            free(array);
+                            file = NULL;
+                            error = fopen_s(&file, filepath, "r");
+
+                            if (file == NULL) {
+                                    printf("Error in input file. Error %d\n", error);
+                            }
+                            else {
+                                if (fscanf_s(file, "%d", &arrsize) != 1) {
+                                    printf("Error\n");
+                                    return 0;
+                                }
+                            }
+                            array = (int*)malloc(sizeof(int) * arrsize);
+
+                            for (int i = 0; i < arrsize; i++) {
+                                if (fscanf_s(file, "%d", &array[i]) != 1) {
+                                    printf("Error\n");
+                                    return 0;
+                                }
+                            }
+
+                            printf(language == 0 ? "Массив получен\n" : "Data was read\n");
+                            fclose(file);
+                            printarray(array, arrsize, language);
                             system("pause");
                             incase_flag = 1;
                             break;
