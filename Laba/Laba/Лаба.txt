@@ -49,3 +49,8 @@ Settings/Настройки +
 		output.txt
 		input.txt
 		temp.txt
+
+Сортивровки:
+	выбором +
+	хоара
+	слиянием

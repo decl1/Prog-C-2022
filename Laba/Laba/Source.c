@@ -22,7 +22,7 @@
 #define MENU_SIZE 4
 #define ALGMENU_SIZE 3
 #define SEARCHMENU_SIZE 3
-#define SORTMENU_SIZE 2
+#define SORTMENU_SIZE 5
 #define SETSMENU_SIZE 4
 #define SETARR_SIZE 4
 
@@ -179,37 +179,30 @@ void randarray(int* array, int size, int lang) {
         array[i] = min + rand() % (abs(min-max)+1);
     }
 }
-void initfromfile(FILE* file, int *arrsize,int** array, char* filepath) {
-    errno_t error;
-
-    error = fopen_s(&file, filepath, "r+");
-
-    if (file == NULL) {
-        printf("Error in input file. Error %d\n", error);
-    }
-    else {
-        if (fscanf_s(file, "%d", arrsize) != 1) {
-            printf("Error\n");
-            return 0;
+void viborsort(int* array, int size) {
+    int tempmin,tminindex,temp;
+    for (int i = 0; i < size; i++) {
+        tempmin = array[i];
+        tminindex = i;
+        for (int k = i; k < size; k++) {
+            if (tempmin > array[k]) {
+                tempmin = array[k];
+                tminindex = k;
+            }
         }
+        temp = array[i];
+        array[i] = tempmin;
+        array[tminindex] = temp;
     }
-    *array = (int*)malloc(sizeof(int) * (*arrsize));
-    printf("%d\n", *arrsize);
-     
 }
-void fillfromfile(FILE* file, int arrsize, int* array, int language) {
-    for (int i = 0; i < arrsize; i++) {
-        if (fscanf_s(file, "%d", &array[i]) != 1) {
-            printf("Error\n");
-            return 0;
-        }
-    }
-    printf(language == 0 ? "Массив получен\n" : "Data was read\n");
+void quicksort(int* array, int size) {
+    
 }
+
 
 
 int main() {
-    system("title Application");
+    system("title Laba Anikin M");
 
     srand(time(0));
     SetConsoleCP(1251);
@@ -230,12 +223,30 @@ int main() {
     int incase_flag;
     COORD cursorPos;     
 
-    char* menu[LANG_CNT][MENU_SIZE] = { { "Режим эксперимента","Алгоритмы", "Settings/Настройки", "Выход"},{"Exp mode","Algs","Settings/Настройки","Exit"}};
-    char* algorithms[LANG_CNT][ALGMENU_SIZE] = { { "Поиск", "Сортировки", "Назад" }, { "Search","Sorts","Back" } };
-    char* search[LANG_CNT][SEARCHMENU_SIZE] = { { "Наивный поиск","Бинарный поиск", "Назад" }, { "Stupid search","Bin search","Back" } };
-    char* sorts[LANG_CNT][SORTMENU_SIZE] = { { "Пузырьковая сортировка", "Назад" }, { "Bubble sort","Back"} };
-    char* settings[LANG_CNT][SETSMENU_SIZE] = { {"Language/Язык", "Задать массив", "Посмотреть текущий массив", "Назад"}, {"Language/Язык","Set array","Check our array","Back"}};
-    char* setarrayact[LANG_CNT][SETARR_SIZE] = { {"Ручной ввод","Рандомный ввод","Прочитать из файла", "Назад"}, {"Manual enter","Random array","Read from file", "Back"}};
+    char* menu[LANG_CNT][MENU_SIZE] = { 
+        { "Режим эксперимента","Алгоритмы", "Settings/Настройки", "Выход"},
+        {"Exp mode","Algs","Settings/Настройки","Exit"}
+    };
+    char* algorithms[LANG_CNT][ALGMENU_SIZE] = {
+        { "Поиск", "Сортировки", "Назад" },
+        { "Search","Sorts","Back" }
+    };
+    char* search[LANG_CNT][SEARCHMENU_SIZE] = { 
+        { "Наивный поиск","Бинарный поиск", "Назад" }, 
+        { "Stupid search","Bin search","Back" } 
+    };
+    char* sorts[LANG_CNT][SORTMENU_SIZE] = { 
+        { "Пузырьковая сортировка", "Сортировка выбором","Быстрая сортировка Хоара","Сортировка слиянием","Назад"}, 
+        {"Bubble sort","Choose sort","Quick sort", "Merge sort","Back"}
+    };
+    char* settings[LANG_CNT][SETSMENU_SIZE] = { 
+        {"Language/Язык", "Задать массив", "Посмотреть текущий массив", "Назад"}, 
+        {"Language/Язык","Set array","Check our array","Back"}
+    };
+    char* setarrayact[LANG_CNT][SETARR_SIZE] = { 
+        {"Ручной ввод","Рандомный ввод","Прочитать из файла", "Назад"}, 
+        {"Manual enter","Random array","Read from file", "Back"}
+    };
 
     char* lngs[LANG_CNT] = { "Русский","English" };
 
@@ -301,7 +312,7 @@ int main() {
                                 system("pause");
                             }
                             break;
-                        case 2: //Back
+                        case (SEARCHMENU_SIZE - 1): //Back
                             incase_flag = 1;
                             break;
                         }
@@ -317,7 +328,21 @@ int main() {
                             printarray(array, arrsize, language);
                             system("pause");
                             break;
-                        case 1: //Back
+                        case 1: // vibor sort
+                            system("cls");
+                            viborsort(array, arrsize);
+                            printarray(array, arrsize, language);
+                            system("pause");
+                            break;
+                        case 2:
+                            system("cls");
+
+
+
+                            printf("Debug_test: %c\n", (ifsorted(array, arrsize) == 1 ? 'Y' : 'N'));
+                            system("pause");
+                            break;
+                        case (SORTMENU_SIZE - 1): //Back
                             incase_flag = 1;
                             break;
                         }
@@ -369,15 +394,17 @@ int main() {
                             break;
                         case 2: // read from file
                             system("cls");
-                            char filepath[300];
+                            char filepath[300] = "C:\\decll\\programs\\Prog-C-2022\\Laba\\files\\input.txt";
 
                             GetConsoleCursorInfo(hStdOut, &structCursorInfo);
                             structCursorInfo.bVisible = TRUE;
                             SetConsoleCursorInfo(hStdOut, &structCursorInfo);
                             //char debutsymbol;
-                            printf(language == 0 ? "Введите расположение файла: " : "Input filepath: ");
+
+                            /*printf(language == 0 ? "Введите расположение файла: " : "Input filepath: ");
                             scanf_s(" ");
-                            gets(filepath);
+                            gets(filepath);*/
+
                             system("cls");
 
                             GetConsoleCursorInfo(hStdOut, &structCursorInfo);
@@ -423,14 +450,14 @@ int main() {
                     printarray(array, arrsize, language);
                     system("pause");
                     break;
-                case 3: // back
+                case (SETSMENU_SIZE - 1): // back
                     system("cls");
                     incase_flag = 0;
                     break;
                 }
             }
             break;
-        case 3: // Exit
+        case (MENU_SIZE - 1): // Exit
             exit_flag = 1;
             break;
         }
