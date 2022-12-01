@@ -23,7 +23,7 @@
 #define ALGMENU_SIZE 3
 #define SEARCHMENU_SIZE 3
 #define SORTMENU_SIZE 5
-#define SETSMENU_SIZE 4
+#define SETSMENU_SIZE 5
 #define SETARR_SIZE 4
 
 #define NONE_TITLE ""
@@ -298,9 +298,9 @@ int main() {
     int choose_pos;
     int exit_flag;
     int incase_flag;
-    COORD cursorPos;     
+    COORD cursorPos;
 
-    char* menu[LANG_CNT][MENU_SIZE] = { 
+    char* menu[LANG_CNT][MENU_SIZE] = {
         { "Режим эксперимента","Алгоритмы", "Settings/Настройки", "Выход"},
         {"Exp mode","Algs","Settings/Настройки","Exit"}
     };
@@ -308,27 +308,33 @@ int main() {
         { "Поиск", "Сортировки", "Назад" },
         { "Search","Sorts","Back" }
     };
-    char* search[LANG_CNT][SEARCHMENU_SIZE] = { 
-        { "Наивный поиск","Бинарный поиск", "Назад" }, 
-        { "Stupid search","Bin search","Back" } 
+    char* search[LANG_CNT][SEARCHMENU_SIZE] = {
+        { "Наивный поиск","Бинарный поиск", "Назад" },
+        { "Stupid search","Bin search","Back" }
     };
-    char* sorts[LANG_CNT][SORTMENU_SIZE] = { 
-        { "Пузырьковая сортировка", "Сортировка выбором","Быстрая сортировка Хоара","Сортировка слиянием","Назад"}, 
+    char* sorts[LANG_CNT][SORTMENU_SIZE] = {
+        { "Пузырьковая сортировка", "Сортировка выбором","Быстрая сортировка Хоара","Сортировка слиянием","Назад"},
         {"Bubble sort","Choose sort","Quick sort", "Merge sort","Back"}
     };
-    char* settings[LANG_CNT][SETSMENU_SIZE] = { 
-        {"Language/Язык", "Задать массив", "Посмотреть текущий массив", "Назад"}, 
-        {"Language/Язык","Set array","Check our array","Back"}
+    char* settings[LANG_CNT][SETSMENU_SIZE] = {
+        {"Language/Язык", "Задать массив", "Посмотреть текущий массив","Изменить дирректории файлов", "Назад"},
+        {"Language/Язык","Set array","Check our array","Change files directory","Back"}
     };
-    char* setarrayact[LANG_CNT][SETARR_SIZE] = { 
-        {"Ручной ввод","Рандомный ввод","Прочитать из файла", "Назад"}, 
+    char* setarrayact[LANG_CNT][SETARR_SIZE] = {
+        {"Ручной ввод","Рандомный ввод","Прочитать из файла", "Назад"},
         {"Manual enter","Random array","Read from file", "Back"}
     };
 
     char* lngs[LANG_CNT] = { "Русский","English" };
-
+    char* filesmenu[LANG_CNT][3] = { 
+        {"Файл ввода", "Файл вывода", "Назад"},
+        { "input file", "output file", "Back" } 
+    };
     int* array = NULL;
     int arrsize = -1;
+
+    char inp_filepath[300] = "C:\\decll\\programs\\Prog-C-2022\\Laba\\files\\input.txt";
+    char out_filepath[300] = "C:\\decll\\programs\\Prog-C-2022\\Laba\\files\\output.txt";
 
     int language = RUS;
 
@@ -421,7 +427,6 @@ int main() {
                             system("cls");
                             my_mergesort(array, arrsize);
                             printarray(array, arrsize, language);
-                            printf("Debug_test: %c\n", (ifsorted(array, arrsize) == 1 ? 'Y' : 'N'));
                             system("pause");
                             break;
                         case (SORTMENU_SIZE - 1): //Back
@@ -476,26 +481,10 @@ int main() {
                             break;
                         case 2: // read from file
                             system("cls");
-                            char filepath[300] = "C:\\decll\\programs\\Prog-C-2022\\Laba\\files\\input.txt";
-
-                            GetConsoleCursorInfo(hStdOut, &structCursorInfo);
-                            structCursorInfo.bVisible = TRUE;
-                            SetConsoleCursorInfo(hStdOut, &structCursorInfo);
-                            //char debutsymbol;
-
-                            /*printf(language == 0 ? "Введите расположение файла: " : "Input filepath: ");
-                            scanf_s(" ");
-                            gets(filepath);*/
-
-                            system("cls");
-
-                            GetConsoleCursorInfo(hStdOut, &structCursorInfo);
-                            structCursorInfo.bVisible = FALSE;
-                            SetConsoleCursorInfo(hStdOut, &structCursorInfo);
-
+                            
                             free(array);
                             file = NULL;
-                            error = fopen_s(&file, filepath, "r");
+                            error = fopen_s(&file, inp_filepath, "r");
 
                             if (file == NULL) {
                                     printf("Error in input file. Error %d\n", error);
@@ -530,6 +519,55 @@ int main() {
                     break;
                 case 2: // check array
                     printarray(array, arrsize, language);
+                    system("pause");
+                    break;
+                case 3: // dir change
+                    system("cls");
+
+                    choosepos(&choose_pos, filesmenu[language],
+                        &cursorPos, hStdOut, 3, language == 0 ? "Файл:" : "File:");
+                    switch(choose_pos) { 
+                    case 0:
+                        system("cls");
+                        GetConsoleCursorInfo(hStdOut, &structCursorInfo);
+                        structCursorInfo.bVisible = TRUE;
+                        SetConsoleCursorInfo(hStdOut, &structCursorInfo);
+
+                        printf(language == 0 ? "Введите расположение файла или \"default\": " : "Input filepath or \"default\": ");
+                        scanf_s(" ");
+                        gets(inp_filepath);
+
+                        if (!strcmp(inp_filepath, "default"))
+                            strcpy_s(inp_filepath, sizeof(inp_filepath),"C:\\decll\\programs\\Prog-C-2022\\Laba\\files\\input.txt");
+                        system("cls");
+
+                        GetConsoleCursorInfo(hStdOut, &structCursorInfo);
+                        structCursorInfo.bVisible = FALSE;
+                        SetConsoleCursorInfo(hStdOut, &structCursorInfo);
+                        break;
+                    case 1:
+                        system("cls");
+                        GetConsoleCursorInfo(hStdOut, &structCursorInfo);
+                        structCursorInfo.bVisible = TRUE;
+                        SetConsoleCursorInfo(hStdOut, &structCursorInfo);
+
+                        printf(language == 0 ? "Введите расположение файла или \"default\": " : "Input filepath or \"default\": ");
+                        scanf_s(" ");
+                        gets(out_filepath);
+
+                        if (!strcmp(out_filepath, "default"))
+                            strcpy_s(out_filepath, sizeof(out_filepath), "C:\\decll\\programs\\Prog-C-2022\\Laba\\files\\output.txt");
+
+                        system("cls");
+
+                        GetConsoleCursorInfo(hStdOut, &structCursorInfo);
+                        structCursorInfo.bVisible = FALSE;
+                        SetConsoleCursorInfo(hStdOut, &structCursorInfo);
+                        break;
+                    case 2:
+                        break;
+                    }
+                    printf("input file: %s\noutput file: %s\n", inp_filepath, out_filepath);
                     system("pause");
                     break;
                 case (SETSMENU_SIZE - 1): // back
