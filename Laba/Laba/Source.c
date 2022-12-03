@@ -298,6 +298,7 @@ int main() {
     int choose_pos;
     int exit_flag;
     int incase_flag;
+    int sort_flag;
     COORD cursorPos;
 
     char* menu[LANG_CNT][MENU_SIZE] = {
@@ -343,6 +344,7 @@ int main() {
 
     exit_flag = 0;
     incase_flag = 1;
+    sort_flag = 0;
 
     while (!exit_flag) {
         system("cls");
@@ -409,31 +411,56 @@ int main() {
                         case 0: // Bubble sort
                             bubble_sort(array, arrsize);
                             printarray(array, arrsize, language);
-                            system("pause");
+                            sort_flag = arrsize == -1 ? 0 : 1;
                             break;
                         case 1: // vibor sort
                             system("cls");
                             viborsort(array, arrsize);
                             printarray(array, arrsize, language);
-                            system("pause");
+                            sort_flag = arrsize == -1 ? 0 : 1;
                             break;
                         case 2: // qsort
                             system("cls");
                             quicksort(array, arrsize);
                             printarray(array, arrsize, language);
-                            system("pause");
+                            sort_flag = arrsize == -1 ? 0 : 1;
                             break;
                         case 3: // merge sort
                             system("cls");
                             my_mergesort(array, arrsize);
                             printarray(array, arrsize, language);
-                            system("pause");
+                            sort_flag = arrsize == -1 ? 0 : 1;
                             break;
                         case (SORTMENU_SIZE - 1): //Back
+                            sort_flag = 0;
                             incase_flag = 1;
                             break;
                         }
+                        if (sort_flag == 1) {
+                        file = NULL;
+                        error = fopen_s(&file, out_filepath, "w");
+
+                        if (file == NULL) {
+                            printf("Error in input file. Error %d\n", error);
+                        }
+                        else {
+                            if (fprintf(file, "%d\n", arrsize) < 0) {
+                                printf("Error\n");
+                                return 0;
+                            }
+                        }
+                        for (int i = 0; i < arrsize; i++) {
+                            if (fprintf(file, "%d ", array[i]) < 0) {
+                                printf("Error\n");
+                                return 0;
+                            }
+                        }
+                        printf(language == 0 ? "Массив записан\n" : "Data was write\n");
+                        fclose(file);
+                        system("pause");
+                        }
                     }
+                    
                     break;
                 case 2: // Back
                     system("cls");
