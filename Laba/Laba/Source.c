@@ -100,8 +100,9 @@ void printarray(int* array, int size, int lang) {
     }
     printf("\n");
 }
-void bubble_sort(int* array, int size) {
+int bubble_sort(int* array, int size) {
     int temp = 0;
+    int swaps = 0;
     if (size != -1) {
         for (int i = 0; i < size; i++) {
             for (int j = i; j < size; j++) {
@@ -109,10 +110,12 @@ void bubble_sort(int* array, int size) {
                     temp = array[i];
                     array[i] = array[j];
                     array[j] = temp;
+                    swaps++;
                 }
             }
         }
     }
+    return swaps;
 }
 void stupidsearch(int* array, int size, int lang) {
     system("cls");
@@ -180,8 +183,8 @@ void randarray(int* array, int size, int lang) {
         array[i] = min + rand() % (abs(min-max)+1);
     }
 }
-void viborsort(int* array, int size) {
-    int tempmin,tminindex,temp;
+int viborsort(int* array, int size) {
+    int tempmin,tminindex,temp, swaps = 0; 
     for (int i = 0; i < size; i++) {
         tempmin = array[i];
         tminindex = i;
@@ -194,12 +197,15 @@ void viborsort(int* array, int size) {
         temp = array[i];
         array[i] = tempmin;
         array[tminindex] = temp;
+        swaps++;
     }
+    return swaps;
 }
-
+int qsort_swaps = 0;
 int quicksort(int* a, int len) {
+    qsort_swaps = 0;
     quicksort_r(a, 0, len - 1);
-    return 0;
+    return qsort_swaps;
 }
 int quicksort_r(int* a, int start, int end) {
     if (start >= end) {
@@ -207,31 +213,30 @@ int quicksort_r(int* a, int start, int end) {
     }
     int pivot = a[end];
     int swp;
-    //set a pointer to divide array into two parts
-    //one part is smaller than pivot and another larger
     int pointer = start;
     int i;
     for (i = start; i < end; i++) {
         if (a[i] < pivot) {
             if (pointer != i) {
-                //swap a[i] with a[pointer]
-                //a[pointer] behind larger than pivot
                 swp = a[i];
                 a[i] = a[pointer];
                 a[pointer] = swp;
+                qsort_swaps++;
             }
             pointer++;
         }
     }
-    //swap back pivot to proper position
     swp = a[end];
     a[end] = a[pointer];
     a[pointer] = swp;
+    qsort_swaps++;
     quicksort_r(a, start, pointer - 1);
     quicksort_r(a, pointer + 1, end);
     return 0;
 }
+int msort_swaps = 0;
 int my_mergesort(int* a, int len) {
+    msort_swaps = 0;
     int step = 1;
     int* m1 = (int*)malloc(len * sizeof(int));
     if (!m1) return -1;
@@ -248,7 +253,7 @@ int my_mergesort(int* a, int len) {
         }
         step = step << 1;
     }
-    return 0;
+    return msort_swaps;
 }
 int merge_two(int* a, int s1, int e1, int s2, int e2, int* m1, int* m2) {
     int len1 = e1 - s1 + 1;
@@ -265,33 +270,135 @@ int merge_two(int* a, int s1, int e1, int s2, int e2, int* m1, int* m2) {
         else {
             a[p++] = m2[p2++];
         }
+        msort_swaps++;
     }
     while (p1 < len1) {
         a[p++] = m1[p1++];
+        msort_swaps++;
     }
     while (p2 < len2) {
         a[p++] = m2[p2++];
+        msort_swaps++;
     }
     return 0;
 }
-
 int intlen(int a) {
     int i = 1;
+    if (a < 0)
+        i++;
+    a = abs(a);
     while (a >= 10) {
         i++;
         a /= 10;
     }
     return i;
 }
+void sorts_comparing_table(int* array, int size, int (*sorts[4])(int*, int), int language) {
+    char* title[LANG_CNT][5] = {
+        {"Сортировка","Время","Замедление","Перестановки","Увел. Перестановки"},
+        {"Sort","Time","Time Ratio","Swaps","Swaps Ratio"},
+    };
+    char* ssorts[4] = {"Bubble sort" , "Vibor sort", "Quick sort", "Merge sort"};
+    int sort_comp_debug = SORTMENU_SIZE - 1;
+    int* times = (int*)malloc(sizeof(int) * sort_comp_debug);
+    int* timeratio = (int*)malloc(sizeof(int) * sort_comp_debug);
+    int* swaps = (int*)malloc(sizeof(int) * sort_comp_debug);
+    int* swapratio = (int*)malloc(sizeof(int) * sort_comp_debug);
+    int time;
 
-void draw_efficiency_table(void (*sorts[4])(int*, int), int language) {
+    int* testarr = (int*)malloc(sizeof(int) * size);
+    for (int i = 0; i < sort_comp_debug; i++) {
+        for (int k = 0; k < size; k++) {
+            testarr[k] = array[k];
+        }
+        time = clock();
+        swaps[i] = sorts[i](testarr, size);
+        time = clock() - time;
+        times[i] = time;
+    }
+    int mintime = times[0];
+    for (int i = 0; i < sort_comp_debug; i++) {
+        if (times[i] < mintime)
+            mintime = times[i];
+    }
+    if (mintime == 0)
+        mintime = 1;
+    for (int i = 0; i < sort_comp_debug; i++) {
+        timeratio[i] = times[i] / mintime;
+    }
+    int minswap = swaps[0];
+    for (int i = 0; i < sort_comp_debug; i++) {
+        if (swaps[i] < minswap)
+            minswap = swaps[i];
+    }
+    if (minswap == 0)
+        minswap = 1;   
+    for (int i = 0; i < sort_comp_debug; i++) {
+        swapratio[i] = swaps[i] / minswap;
+    }
+    int column_len[5] = { strlen(title[language][0]), strlen(title[language][1]), strlen(title[language][2]), strlen(title[language][3]), strlen(title[language][4])};
+    for (int i = 0; i < sort_comp_debug; i++) {
+        if (strlen(ssorts[i]) > column_len[0])
+            column_len[0] = strlen(ssorts[i]);
+    }
+    for (int i = 0; i < sort_comp_debug; i++) {
+        if (intlen(times[i]) > column_len[1])
+            column_len[1] = intlen(times[i]);
+    }
+    for (int i = 0; i < sort_comp_debug; i++) {
+        if (intlen(timeratio[i]) > column_len[2])
+            column_len[2] = intlen(timeratio[i]);
+    }
+    for (int i = 0; i < sort_comp_debug; i++) {
+        if (intlen(swaps[i]) > column_len[3])
+            column_len[3] = intlen(swaps[i]);
+    }
+    for (int i = 0; i < sort_comp_debug; i++) {
+        if (intlen(swapratio[i]) > column_len[4])
+            column_len[4] = intlen(swapratio[i]);
+    }
+    //printf("%d\n", column_len[0]);
+    //system("pause");
+
+    for (int k = 0; k < 5; k++) {
+        printf("|%s", title[language][k]);
+        for (int i = 0; i < column_len[k] - strlen(title[language][k]); i++) {
+            printf(" ");
+        }
+    }
+    printf("|\n");
+    for (int l = 0; l < sort_comp_debug; l++) {
+        printf("|%s", ssorts[l]);
+        for (int i = 0; i < column_len[0] - strlen(ssorts[l]); i++) {
+            printf(" ");
+        }
+        printf("|%d", times[l]);
+        for (int i = 0; i < column_len[1] - intlen(times[l]); i++) {
+            printf(" ");
+        }
+        printf("|%d", timeratio[l]);
+        for (int i = 0; i < column_len[2] - intlen(timeratio[l]); i++) {
+            printf(" ");
+        }
+        printf("|%d", swaps[l]);
+        for (int i = 0; i < column_len[3] - intlen(swaps[l]); i++) {
+            printf(" ");
+        }
+        printf("|%d", swapratio[l]);
+        for (int i = 0; i < column_len[4] - intlen(swapratio[l]); i++) {
+            printf(" ");
+        }
+        printf("|\n");
+    }
+}
+void draw_efficiency_table(int (*sorts[4])(int*, int), int language) {
     int sort_vibor;
     int tests;
     char* titles[LANG_CNT][3] = {
         {"Кол-во элементов","Время","Увеличение"},
         {"Number of elements","Time","Compare"},
     };
-    printf("bubble_sort - 1, viborsort - 2, quicksort - 3, mergesort - 4\n");
+    printf("Bubble sort - 1, Vibor sort - 2, Quick sort - 3, Merge sort - 4\n");
     printf(language == 0 ? "Выберете сортировку: " : "Enter sort: ");
     scanf_s("%d", &sort_vibor);
     printf(language == 0 ? "Введите количество проверок: " : "Enter number of tests: ");
@@ -362,89 +469,6 @@ void draw_efficiency_table(void (*sorts[4])(int*, int), int language) {
 
 }
 
-//void draw_table() {
-//    int I = 0, J = 0, maxlen;
-//    char c;
-//    printf("Введите число столбцов таблицы: ");
-//    scanf_s("%d", &I);
-//    char** title = (char**)malloc(I * sizeof(char*));
-//    for (int i = 0; i < I; i++) {
-//        title[i] = (char*)malloc(100 * sizeof(char));
-//    }
-//    for (int i = 0; i < I; i++) {
-//        for (int j = 0; j < 100; j++) {
-//            title[i][j] = '\0';
-//        }
-//    }
-//    printf("Введите заголовки таблицы:\n");
-//    getchar();
-//    for (int i = 0; i < I; i++) {
-//        int j = 0;
-//        while ((c = getchar()) != '\n' && j < 100) {
-//            title[i][j] = c;
-//            j++;
-//        }
-//    }
-//    printf("\n");
-//    printf("Введите количество строк таблицы: ");
-//    scanf_s("%d", &J);
-//    int** line = (int**)malloc(I * sizeof(int*));
-//    for (int i = 0; i < I; i++) {
-//        line[i] = (int*)malloc(J * sizeof(int));
-//    }
-//    for (int i = 0; i < I; i++) {
-//        printf("Введите данные для заполнения столбца %s: ", title[i]);
-//        for (int j = 0; j < J; j++) {
-//            scanf_s(" %d", &line[i][j]);
-//        }
-//    }
-//    printf("\n");
-//    int* columnlen = (int*)malloc(I * sizeof(int));
-//    for (int i = 0; i < I; i++) {
-//        maxlen = 0;
-//        if (maxlen < strlen(title[i])) {
-//            maxlen = strlen(title[i]);
-//        }
-//        for (int k = 0; k < I; k++) {
-//            if (maxlen < intlen(line[i][k])) {
-//                maxlen = intlen(line[i][k]);
-//            }
-//        }
-//        columnlen[i] = maxlen;
-//    }
-//    printf("Ваша таблица:\n");
-//    for (int i = 0; i < I; i++) {
-//        printf("|");
-//        printf("%s", title[i]);
-//        for (int k = 0; k < (columnlen[i] - strlen(title[i])); k++) {
-//            printf(" ");
-//        }
-//    }
-//    printf("|");
-//    for (int j = 0; j < J; j++) {
-//        printf("\n");
-//        printf("|");
-//        for (int i = 0; i < I; i++) {
-//            printf("%d", line[i][j]);
-//            for (int k = 0; k < (columnlen[i] - intlen(line[i][j])); k++) {
-//                printf(" ");
-//            }
-//            printf("|");
-//        }
-//    }
-//    printf("\n");
-//    // ачищееение
-//    for (int i = 0; i < I; i++) {
-//        free(title[i]);
-//    }
-//    free(title);
-//    for (int i = 0; i < I; i++) {
-//        free(line[i]);
-//    }
-//    free(line);
-//    free(columnlen);
-//}
-
 int main() {
     system("title Laba Anikin M");
 
@@ -496,8 +520,6 @@ int main() {
         {"Сравнение сортировок","Эффективонсть","debug","Назад"},
         {"Compare sorts","Efficiency","debug","Back"},
     };
-
-
     char* lngs[LANG_CNT] = { "Русский","English" };
     char* filesmenu[LANG_CNT][3] = { 
         {"Файл ввода", "Файл вывода", "Назад"},
@@ -505,10 +527,8 @@ int main() {
     };
     int* array = NULL;
     int arrsize = -1;
-
     char inp_filepath[300] = "C:\\decll\\programs\\Prog-C-2022\\Laba\\files\\input.txt";
     char out_filepath[300] = "C:\\decll\\programs\\Prog-C-2022\\Laba\\files\\output.txt";
-
     int language = RUS;
 
     FILE* file = NULL;
@@ -518,7 +538,7 @@ int main() {
     incase_flag = 1;
     sort_flag = 0;
 
-    void (*p_sorts[4])(int*, int) = { bubble_sort , viborsort , quicksort , my_mergesort };
+    int (*p_sorts[4])(int*, int) = { bubble_sort , viborsort , quicksort , my_mergesort };
 
     while (!exit_flag) {
         system("cls");
@@ -532,7 +552,10 @@ int main() {
                 switch (choose_pos) {
                 case 0:
                     system("cls");
-
+                    if (arrsize != -1)
+                        sorts_comparing_table(array, arrsize, p_sorts, language);
+                    else
+                        printf(language == 0 ? "Массив не определен\n" : "Array not defined\n");
                     system("pause");
                     break;
                 case 1:
