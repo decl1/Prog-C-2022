@@ -306,6 +306,7 @@ void sorts_comparing_table(int* array, int size, int (*sorts[4])(int*, int), int
     int* swapratio = (int*)malloc(sizeof(int) * sort_comp_debug);
     int time;
 
+    printf(language == 0 ?"Загрузка...": "Loading...");
     int* testarr = (int*)malloc(sizeof(int) * size);
     for (int i = 0; i < sort_comp_debug; i++) {
         for (int k = 0; k < size; k++) {
@@ -359,6 +360,7 @@ void sorts_comparing_table(int* array, int size, int (*sorts[4])(int*, int), int
     }
     //printf("%d\n", column_len[0]);
     //system("pause");
+    system("cls");
 
     for (int k = 0; k < 5; k++) {
         printf("|%s", title[language][k]);
@@ -410,6 +412,7 @@ void draw_efficiency_table(int (*sorts[4])(int*, int), int language) {
     for (int i = 0; i < tests; i++) {
         scanf_s(" %d", &numberofelement[i]);
     }
+    printf(language == 0 ? "\nЗагрузка..." : "\nLoading..");
     int time;
     for (int i = 0; i < tests; i++) {
         time = clock();
@@ -443,7 +446,7 @@ void draw_efficiency_table(int (*sorts[4])(int*, int), int language) {
         if (intlen(timeratio[i]) > column_len[2])
             column_len[2] = intlen(timeratio[i]);
     }
-
+    system("cls");
     for (int k = 0; k < 3; k++) {
         printf("|%s", titles[language][k]);
         for (int i = 0; i < column_len[k] - strlen(titles[language][k]); i++) {
@@ -490,6 +493,7 @@ int main() {
     int exit_flag;
     int incase_flag;
     int sort_flag;
+    int dir_flag;
     COORD cursorPos;
 
     char* menu[LANG_CNT][MENU_SIZE] = {
@@ -509,7 +513,7 @@ int main() {
         {"Bubble sort","Choose sort","Quick sort", "Merge sort","Back"}
     };
     char* settings[LANG_CNT][SETSMENU_SIZE] = {
-        {"Language/Язык", "Задать массив", "Посмотреть текущий массив","Изменить дирректории файлов", "Назад"},
+        {"Language/Язык", "Задать массив", "Посмотреть текущий массив","Изменить директории файлов", "Назад"},
         {"Language/Язык","Set array","Check our array","Change files directory","Back"}
     };
     char* setarrayact[LANG_CNT][SETARR_SIZE] = {
@@ -517,7 +521,7 @@ int main() {
         {"Manual enter","Random array","Read from file", "Back"}
     };
     char* exp_mode_menu[LANG_CNT][EXPMMENU_SIZE] = {
-        {"Сравнение сортировок","Эффективонсть","debug","Назад"},
+        {"Сравнение сортировок","Эффективность","debug","Назад"},
         {"Compare sorts","Efficiency","debug","Back"},
     };
     char* lngs[LANG_CNT] = { "Русский","English" };
@@ -534,6 +538,7 @@ int main() {
     FILE* file = NULL;
     errno_t error;
 
+    dir_flag = 0;
     exit_flag = 0;
     incase_flag = 1;
     sort_flag = 0;
@@ -566,7 +571,7 @@ int main() {
                 case 2:
                     system("cls");
 
-                    printf("\n");
+                    printf("  *   *\n *** ***\n**** ****\n*********\n ******* \n  *****  \n   ***   \n    *    \n");
 
                     system("pause");
                     break;
@@ -658,7 +663,7 @@ int main() {
                             incase_flag = 1;
                             break;
                         }
-                        if (sort_flag == 1) {
+                        if (sort_flag == 1 && dir_flag == 1) {
                         file = NULL;
                         error = fopen_s(&file, out_filepath, "w");
 
@@ -680,6 +685,9 @@ int main() {
                         printf(language == 0 ? "Массив записан\n" : "Data was write\n");
                         fclose(file);
                         system("pause");
+                        }
+                        else {
+                            system("pause");
                         }
                     }
                     
@@ -782,7 +790,7 @@ int main() {
                         structCursorInfo.bVisible = TRUE;
                         SetConsoleCursorInfo(hStdOut, &structCursorInfo);
 
-                        printf(language == 0 ? "Введите расположение файла или \"default\": " : "Input filepath or \"default\": ");
+                        printf(language == 0 ? "Введите расположение файла: " : "Input filepath: ");
                         scanf_s(" ");
                         gets(inp_filepath);
 
@@ -803,6 +811,7 @@ int main() {
                         printf(language == 0 ? "Введите расположение файла или \"default\": " : "Input filepath or \"default\": ");
                         scanf_s(" ");
                         gets(out_filepath);
+                        dir_flag = 1;
 
                         if (!strcmp(out_filepath, "default"))
                             strcpy_s(out_filepath, sizeof(out_filepath), "C:\\decll\\programs\\Prog-C-2022\\Laba\\files\\output.txt");
