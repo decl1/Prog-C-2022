@@ -33,6 +33,11 @@
 #define RUS 0
 #define ENG 1
 
+struct sort_stat {
+    int swap_count;
+    int comp_count;
+};
+
 void choosepos(int* choose_pos, char** menu, COORD* cursorPos, HANDLE hStdOut, int menu_size, char* text) {
     int iKey = 67;
     int line = (text == NONE_TITLE) ? 0 : 1;
@@ -100,12 +105,14 @@ void printarray(int* array, int size, int lang) {
     }
     printf("\n");
 }
-int bubble_sort(int* array, int size) {
+struct sort_stat bubble_sort(int* array, int size) {
     int temp = 0;
     int swaps = 0;
+    int comp = 0;
     if (size != -1) {
         for (int i = 0; i < size; i++) {
             for (int j = i; j < size; j++) {
+                comp++;
                 if (array[i] > array[j]) {
                     temp = array[i];
                     array[i] = array[j];
@@ -115,7 +122,8 @@ int bubble_sort(int* array, int size) {
             }
         }
     }
-    return swaps;
+    struct sort_stat stat = {swaps,comp};
+    return stat;
 }
 void stupidsearch(int* array, int size, int lang) {
     system("cls");
@@ -183,12 +191,13 @@ void randarray(int* array, int size, int lang) {
         array[i] = min + rand() % (abs(min-max)+1);
     }
 }
-int viborsort(int* array, int size) {
-    int tempmin,tminindex,temp, swaps = 0; 
+struct sort_stat viborsort(int* array, int size) {
+    int tempmin,tminindex,temp, swaps = 0, comp = 0; 
     for (int i = 0; i < size; i++) {
         tempmin = array[i];
         tminindex = i;
         for (int k = i; k < size; k++) {
+            comp++;
             if (tempmin > array[k]) {
                 tempmin = array[k];
                 tminindex = k;
@@ -199,15 +208,17 @@ int viborsort(int* array, int size) {
         array[tminindex] = temp;
         swaps++;
     }
-    return swaps;
+    struct sort_stat stat = {swaps,comp};
+    return stat;
 }
-int qsort_swaps = 0;
-int quicksort(int* a, int len) {
-    qsort_swaps = 0;
-    quicksort_r(a, 0, len - 1);
-    return qsort_swaps;
+struct sort_stat quicksort(int* a, int len) {
+    int qsort_swaps = 0;
+    int comps = 0;
+    quicksort_r(a, 0, len - 1, &qsort_swaps, &comps);
+    struct sort_stat stat = { qsort_swaps,comps };
+    return stat;
 }
-int quicksort_r(int* a, int start, int end) {
+int quicksort_r(int* a, int start, int end, int* qsort_swaps, int* comps) {
     if (start >= end) {
         return 0;
     }
@@ -216,12 +227,14 @@ int quicksort_r(int* a, int start, int end) {
     int pointer = start;
     int i;
     for (i = start; i < end; i++) {
+        (*comps)++;
         if (a[i] < pivot) {
+            (*comps)++;
             if (pointer != i) {
                 swp = a[i];
                 a[i] = a[pointer];
                 a[pointer] = swp;
-                qsort_swaps++;
+                (*qsort_swaps)++;
             }
             pointer++;
         }
@@ -229,19 +242,19 @@ int quicksort_r(int* a, int start, int end) {
     swp = a[end];
     a[end] = a[pointer];
     a[pointer] = swp;
-    qsort_swaps++;
-    quicksort_r(a, start, pointer - 1);
-    quicksort_r(a, pointer + 1, end);
+    (*qsort_swaps)++;
+    quicksort_r(a, start, pointer - 1, qsort_swaps, comps);
+    quicksort_r(a, pointer + 1, end, qsort_swaps, comps);
     return 0;
 }
-int msort_swaps = 0;
-int my_mergesort(int* a, int len) {
-    msort_swaps = 0;
+struct sort_stat my_mergesort(int* a, int len) {
+    int msort_swaps = 0;
+    int comps = 0;
     int step = 1;
     int* m1 = (int*)malloc(len * sizeof(int));
-    if (!m1) return -1;
+    //if (!m1) return -1;
     int* m2 = (int*)malloc(len * sizeof(int));
-    if (!m2) return -1;
+    //if (!m2) return -1;
     while (step < len) {
         int i, s1, e1, s2, e2;
         for (i = 0; (i + step - 1) < (len - 1); i += 2 * step) {
@@ -249,13 +262,14 @@ int my_mergesort(int* a, int len) {
             e1 = i + step - 1;
             s2 = e1 + 1;
             (i + 2 * step - 1) < (len - 1) ? (e2 = i + 2 * step - 1) : (e2 = len - 1);
-            merge_two(a, s1, e1, s2, e2, m1, m2);
+            merge_two(a, s1, e1, s2, e2, m1, m2, &msort_swaps, &comps);
         }
         step = step << 1;
     }
-    return msort_swaps;
+    struct sort_stat stat = { msort_swaps, comps };
+    return stat;
 }
-int merge_two(int* a, int s1, int e1, int s2, int e2, int* m1, int* m2) {
+int merge_two(int* a, int s1, int e1, int s2, int e2, int* m1, int* m2, int* msort_swaps, int* comps) {
     int len1 = e1 - s1 + 1;
     int len2 = e2 - s2 + 1;
     int p1 = 0;
@@ -264,21 +278,22 @@ int merge_two(int* a, int s1, int e1, int s2, int e2, int* m1, int* m2) {
     memcpy(m1, a + s1, sizeof(int) * len1);
     memcpy(m2, a + s2, sizeof(int) * len2);
     while (p1 < len1 && p2 < len2) {
+        (*comps)++;
         if (m1[p1] < m2[p2]) {
             a[p++] = m1[p1++];
         }
         else {
             a[p++] = m2[p2++];
         }
-        msort_swaps++;
+        (*msort_swaps)++;
     }
     while (p1 < len1) {
         a[p++] = m1[p1++];
-        msort_swaps++;
+        (*msort_swaps)++;
     }
     while (p2 < len2) {
         a[p++] = m2[p2++];
-        msort_swaps++;
+        (*msort_swaps)++;
     }
     return 0;
 }
@@ -293,10 +308,10 @@ int intlen(int a) {
     }
     return i;
 }
-void sorts_comparing_table(int* array, int size, int (*sorts[4])(int*, int), int language) {
-    char* title[LANG_CNT][5] = {
-        {"Сортировка","Время","Замедление","Перестановки","Увел. Перестановки"},
-        {"Sort","Time","Time Ratio","Swaps","Swaps Ratio"},
+void sorts_comparing_table(int* array, int size, struct sort_stat (*sorts[4])(int*, int), int language) {
+    char* title[LANG_CNT][7] = {
+        {"Сортировка","Время","Замедление","Перестановки","Увел. Перестановки","Сравнения", "Увел. Сравнений"},
+        {"Sort","Time","Time Ratio","Swaps","Swaps Ratio","Comparisons","Comparisons ratio"},
     };
     char* ssorts[4] = {"Bubble sort" , "Vibor sort", "Quick sort", "Merge sort"};
     int sort_comp_debug = SORTMENU_SIZE - 1;
@@ -304,7 +319,11 @@ void sorts_comparing_table(int* array, int size, int (*sorts[4])(int*, int), int
     int* timeratio = (int*)malloc(sizeof(int) * sort_comp_debug);
     int* swaps = (int*)malloc(sizeof(int) * sort_comp_debug);
     int* swapratio = (int*)malloc(sizeof(int) * sort_comp_debug);
+    int* comps = (int*)malloc(sizeof(int) * sort_comp_debug);
+    int* compratio = (int*)malloc(sizeof(int) * sort_comp_debug);
+
     int time;
+    struct sort_stat stat;
 
     printf(language == 0 ?"Загрузка...": "Loading...");
     int* testarr = (int*)malloc(sizeof(int) * size);
@@ -313,7 +332,9 @@ void sorts_comparing_table(int* array, int size, int (*sorts[4])(int*, int), int
             testarr[k] = array[k];
         }
         time = clock();
-        swaps[i] = sorts[i](testarr, size);
+        stat =sorts[i](testarr, size);
+        swaps[i] = stat.swap_count;
+        comps[i] = stat.comp_count;
         time = clock() - time;
         times[i] = time;
     }
@@ -337,7 +358,18 @@ void sorts_comparing_table(int* array, int size, int (*sorts[4])(int*, int), int
     for (int i = 0; i < sort_comp_debug; i++) {
         swapratio[i] = swaps[i] / minswap;
     }
-    int column_len[5] = { strlen(title[language][0]), strlen(title[language][1]), strlen(title[language][2]), strlen(title[language][3]), strlen(title[language][4])};
+    int mincomp = comps[0];
+    for (int i = 0; i < sort_comp_debug; i++) {
+        if (comps[i] < mincomp)
+            mincomp = comps[i];
+    }
+    if (mincomp == 0)
+        mincomp = 1;
+    for (int i = 0; i < sort_comp_debug; i++) {
+        compratio[i] = comps[i] / mincomp;
+    }
+    int column_len[7] = { strlen(title[language][0]), strlen(title[language][1]), strlen(title[language][2]), strlen(title[language][3]), strlen(title[language][4]),
+                          strlen(title[language][5]), strlen(title[language][6])};
     for (int i = 0; i < sort_comp_debug; i++) {
         if (strlen(ssorts[i]) > column_len[0])
             column_len[0] = strlen(ssorts[i]);
@@ -358,11 +390,19 @@ void sorts_comparing_table(int* array, int size, int (*sorts[4])(int*, int), int
         if (intlen(swapratio[i]) > column_len[4])
             column_len[4] = intlen(swapratio[i]);
     }
+    for (int i = 0; i < sort_comp_debug; i++) {
+        if (intlen(comps[i]) > column_len[5])
+            column_len[5] = intlen(comps[i]);
+    }
+    for (int i = 0; i < sort_comp_debug; i++) {
+        if (intlen(compratio[i]) > column_len[6])
+            column_len[6] = intlen(compratio[i]);
+    }
     //printf("%d\n", column_len[0]);
     //system("pause");
     system("cls");
 
-    for (int k = 0; k < 5; k++) {
+    for (int k = 0; k < 7; k++) {
         printf("|%s", title[language][k]);
         for (int i = 0; i < column_len[k] - strlen(title[language][k]); i++) {
             printf(" ");
@@ -390,10 +430,18 @@ void sorts_comparing_table(int* array, int size, int (*sorts[4])(int*, int), int
         for (int i = 0; i < column_len[4] - intlen(swapratio[l]); i++) {
             printf(" ");
         }
+        printf("|%d", comps[l]);
+        for (int i = 0; i < column_len[5] - intlen(comps[l]); i++) {
+            printf(" ");
+        }
+        printf("|%d", compratio[l]);
+        for (int i = 0; i < column_len[6] - intlen(compratio[l]); i++) {
+            printf(" ");
+        }
         printf("|\n");
     }
 }
-void draw_efficiency_table(int (*sorts[4])(int*, int), int language) {
+void draw_efficiency_table(struct sort_stat (*sorts[4])(int*, int), int language) {
     int sort_vibor;
     int tests;
     char* titles[LANG_CNT][3] = {
@@ -543,7 +591,7 @@ int main() {
     incase_flag = 1;
     sort_flag = 0;
 
-    int (*p_sorts[4])(int*, int) = { bubble_sort , viborsort , quicksort , my_mergesort };
+    struct sort_stat (*p_sorts[4])(int*, int) = { bubble_sort , viborsort , quicksort , my_mergesort };
 
     while (!exit_flag) {
         system("cls");
