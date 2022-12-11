@@ -520,7 +520,8 @@ void draw_efficiency_table(struct sort_stat (*sorts[4])(int*, int), int language
 
 }
 
-int main() {
+int main()
+{
     system("title Laba Anikin M");
 
     srand(time(0));
@@ -735,6 +736,7 @@ int main() {
                         system("pause");
                         }
                         else {
+                            system("cls");
                             system("pause");
                         }
                     }
