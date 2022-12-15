@@ -873,6 +873,7 @@ int main()
                         SetConsoleCursorInfo(hStdOut, &structCursorInfo);
                         break;
                     case 2:
+                        system("cls");
                         break;
                     }
                     printf("input file: %s\noutput file: %s\n", inp_filepath, out_filepath);
